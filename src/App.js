@@ -1,5 +1,5 @@
 import './App.css';
-import Calculate from './Calculate';
+import Calculate from './page/Calculate';
 
 function App() {
   return (

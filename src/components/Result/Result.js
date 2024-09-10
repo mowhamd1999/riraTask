@@ -1,5 +1,5 @@
 import React from "react";
-
+import style from "./Result.module.css";
 const Result = ({
   isLoading,
   amount,
@@ -8,13 +8,13 @@ const Result = ({
   convert,
   rateConvertToCurrency,
 }) => (
-  <div className="third">
-    <div className="main">
+  <div className={style.third}>
+    <div className={style.main}>
       {isLoading ? (
         "Loading..."
       ) : (
         <>
-          <p className="p">
+          <p className={style.p}>
             {amount} {currency} =
           </p>
           <p className="converted_p">
@@ -23,7 +23,7 @@ const Result = ({
         </>
       )}
     </div>
-    <p className="dis">
+    <p className={style.dis}>
       {isLoading
         ? "Loading..."
         : `1 ${convert} = ${rateConvertToCurrency} ${currency}`}
