@@ -5,3 +5,11 @@ This is a task from Rira for me about converting US dollars to Iranian Rials and
 ## Api 
 
 called from ExChange (https://app.exchangerate-api.com)
+
+## Packages used
+
+### axios 
+for call api
+
+### react-icons
+for better ui design
