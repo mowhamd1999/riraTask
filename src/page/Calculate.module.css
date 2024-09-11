@@ -1,4 +1,5 @@
-.div {
+/* پس زمینه */
+.background {
   height: 100vh;
   background: linear-gradient(to bottom, skyblue 50%, white 50%);
   margin: 0px;
@@ -9,6 +10,7 @@
   position: relative;
   top: 20%;
 }
+
 .container {
   display: flex;
   justify-content: center;
@@ -16,6 +18,30 @@
   width: 100%;
   height: 100%;
 }
+.converted_p {
+  font-size: 1.4rem;
+}
+.dis {
+  font-size: 0.9rem;
+  margin: 20px 0px;
+  color: gray;
+}
+.third {
+  padding: 0px 10px;
+}
+.main {
+  margin: 10px 0px;
+}
+.btn {
+  background-color: inherit;
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  font-size: 1rem;
+  margin: 13px 0px 0px 0px;
+  cursor: pointer;
+}
+
 .form {
   background-color: white;
   padding: 40px;
@@ -23,6 +49,33 @@
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   align-items: center;
 }
-.first{
-    display: flex;
+.first {
+  display: flex;
+  align-items: center;
+}
+.amount_label {
+  padding: 5px 10px;
+  text-align: right;
+  margin: 5px;
+}
+.secound {
+  margin: 0px 10px;
+}
+input,
+select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.p {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4c4c4c;
+}
+.span {
+  margin: 0px 0px 10px 0px;
 }

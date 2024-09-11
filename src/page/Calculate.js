@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import CurrencyInput from "../components/CurencyInput/CurrencyInput";
-import SwapButton from "../components/SwapButton/SwapButton";
-import Result from "../components/Result/Result";
-import { fetchConversionRate, fetchReverseConversionRate } from "../api/api";
+import {
+  fetchConversionRate,
+  fetchReverseConversionRate,
+} from "./../services/api";
 import style from "./Calculate.module.css";
-const Calculate = () => {
-  const [currency, setCurrency] = useState("USD"); // ارز پایه
-  const [convert, setConvert] = useState("IRR"); // ارز مقصد
-  const [amount, setAmount] = useState(1); // مقدار ورودی
-  const [converted, setConverted] = useState(""); // نتیجه تبدیل
-  const [rateCurrencyToConvert, setRateCurrencyToConvert] = useState(""); // نرخ ارز پایه به ارز مقصد
-  const [rateConvertToCurrency, setRateConvertToCurrency] = useState(""); // نرخ ارز مقصد به ارز پایه
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(""); // پیام خطا
+import { IoSwapHorizontal } from "react-icons/io5";
 
-  // اعتبارسنجی ورودی
+const Calculate = () => {
+  const [currency, setCurrency] = useState("USD");
+  const [convert, setConvert] = useState("IRR");
+  const [amount, setAmount] = useState(1);
+  const [converted, setConverted] = useState("");
+  const [rateCurrencyToConvert, setRateCurrencyToConvert] = useState("");
+  const [rateConvertToCurrency, setRateConvertToCurrency] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleAmountChange = (e) => {
     const value = e.target.value;
     if (!/^\d*\.?\d*$/.test(value)) {
@@ -25,7 +26,19 @@ const Calculate = () => {
     }
   };
 
-  // جابجایی ارزها
+  const currencySymbol = () => {
+    switch (currency) {
+      case "USD":
+        return "$";
+      case "IRR":
+        return "ریال";
+      case "EUR":
+        return "€";
+      default:
+        return "";
+    }
+  };
+
   const swapCurrencies = () => {
     const temp = currency;
     setCurrency(convert);
@@ -34,18 +47,32 @@ const Calculate = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      async function fetchRates() {
+      async function fetchConversionRates() {
         setIsLoading(true);
         try {
-          const conversionRate = await fetchConversionRate(currency, convert);
-          setConverted((conversionRate * amount).toLocaleString());
-          setRateCurrencyToConvert(conversionRate.toFixed(6));
-
-          const reverseRate = await fetchReverseConversionRate(
-            convert,
-            currency
+          const data = await fetchConversionRate(currency, convert);
+          setConverted(
+            (data.conversion_rate * amount).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 6,
+            })
           );
-          setRateConvertToCurrency(reverseRate.toFixed(6));
+
+          setRateCurrencyToConvert(
+            data.conversion_rate.toLocaleString(undefined, {
+              minimumFractionDigits: 4,
+            })
+          );
+
+          const reverseData = await fetchReverseConversionRate(
+            currency,
+            convert
+          );
+          setRateConvertToCurrency(
+            reverseData.conversion_rate.toLocaleString(undefined, {
+              minimumFractionDigits: 4,
+            })
+          );
         } catch (error) {
           console.error("Error fetching the conversion rates:", error);
         }
@@ -53,11 +80,16 @@ const Calculate = () => {
       }
 
       if (currency === convert) {
-        setConverted(amount.toLocaleString());
+        setConverted(
+          amount.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
         setRateCurrencyToConvert(1);
         setRateConvertToCurrency(1);
       } else {
-        fetchRates();
+        fetchConversionRates();
       }
     }, 1000);
 
@@ -65,39 +97,99 @@ const Calculate = () => {
   }, [amount, currency, convert]);
 
   return (
-    <div className={style.div}>
+    <div className={style.background}>
       <h1 className={style.h1}>به تسک ریرا خوش‌ آمدید</h1>
       <div className={style.container}>
         <div className={style.form}>
           <div className={style.first}>
-            <CurrencyInput
-              amount={amount}
-              currency={currency}
-              onCurrencyChange={setCurrency}
-              onAmountChange={handleAmountChange}
-              isLoading={isLoading}
-              error={error}
-            />
+            <div className={style.secound}>
+              <label htmlFor="amount" className={style.amount_label}>
+                مقدار
+              </label>
+              <div className={style.first}>
+                <span className={style.span}>{currencySymbol()}</span>
+                <input
+                  id="amount"
+                  type="text"
+                  value={amount}
+                  onChange={handleAmountChange}
+                  disabled={isLoading}
+                  style={{ marginLeft: "8px" }}
+                />
+              </div>
+              {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
 
-            <SwapButton swapCurrencies={swapCurrencies} isLoading={isLoading} />
+            <div className={style.secound}>
+              <label htmlFor="from" className={style.amount_label}>
+                از
+              </label>
+              <div>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  disabled={isLoading}
+                  id="from"
+                >
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="IRR">IRR - Iranian Rial</option>
+                </select>
+              </div>
+            </div>
 
-            <CurrencyInput
-              amount={null}
-              currency={convert}
-              onCurrencyChange={setConvert}
-              isLoading={isLoading}
-              error={null}
-            />
+            <button
+              onClick={swapCurrencies}
+              disabled={isLoading}
+              className={style.btn}
+            >
+              <IoSwapHorizontal />
+            </button>
+
+            <div className={style.secound}>
+              <label htmlFor="from" className={style.amount_label}>
+                به
+              </label>
+              <div>
+                <select
+                  value={convert}
+                  onChange={(e) => setConvert(e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="IRR">IRR - Iranian Rial</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <Result
-            amount={amount}
-            currency={currency}
-            converted={converted}
-            convert={convert}
-            rateCurrencyToConvert={rateCurrencyToConvert}
-            rateConvertToCurrency={rateConvertToCurrency}
-            isLoading={isLoading}
-          />
+
+          <div className={style.third}>
+            <div className={style.main}>
+              {isLoading ? (
+                "Loading..."
+              ) : (
+                <>
+                  <p className={style.p}>
+                    {amount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    {currency} =
+                  </p>{" "}
+                  <br />
+                  <p className={style.converted_p}>
+                    {converted} {convert}
+                  </p>
+                </>
+              )}
+            </div>
+
+            <p className={style.dis}>
+              {isLoading
+                ? "Loading..."
+                : `1 ${convert} = ${rateConvertToCurrency} ${currency}`}
+            </p>
+          </div>
         </div>
       </div>
     </div>
